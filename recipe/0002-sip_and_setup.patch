@@ -68,9 +68,18 @@ index 0000000..e235efb
 +%End
 \ No newline at end of file
 diff --git a/sip/FloatingDockContainer.sip b/sip/FloatingDockContainer.sip
-index ba30e6f..45e1f92 100644
+index ba30e6f..b2e892e 100644
 --- a/sip/FloatingDockContainer.sip
 +++ b/sip/FloatingDockContainer.sip
+@@ -5,7 +5,7 @@
+ namespace ads
+ {
+ 
+-class CFloatingDockContainer : QWidget
++class CFloatingDockContainer : QWidget, ads::IFloatingWidget
+ {
+     
+     %TypeHeaderCode
 @@ -20,7 +20,7 @@ protected:
  	void finishDragging();
  	void initFloatingGeometry(const QPoint& DragStartMousePos, const QSize& Size);

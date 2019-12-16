@@ -139,7 +139,7 @@ index 0000000..e235efb
 +%End
 \ No newline at end of file
 diff --git a/sip/FloatingDockContainer.sip b/sip/FloatingDockContainer.sip
-index ba30e6f..03a49c9 100644
+index ba30e6f..d307875 100644
 --- a/sip/FloatingDockContainer.sip
 +++ b/sip/FloatingDockContainer.sip
 @@ -5,7 +5,21 @@
@@ -155,7 +155,7 @@ index ba30e6f..03a49c9 100644
 +
 +public:
 +	virtual void startFloating(const QPoint& DragStartMousePos, const QSize& Size,
-+        eDragState DragState, QWidget* MouseEventHandler);
++        ads::eDragState DragState, QWidget* MouseEventHandler);
 +
 +	virtual void moveFloating() = 0;
 +};
@@ -176,7 +176,7 @@ index ba30e6f..03a49c9 100644
  
 diff --git a/sip/FloatingOverlay.sip b/sip/FloatingOverlay.sip
 new file mode 100644
-index 0000000..c2c8184
+index 0000000..9aa799c
 --- /dev/null
 +++ b/sip/FloatingOverlay.sip
 @@ -0,0 +1,30 @@
@@ -202,7 +202,7 @@ index 0000000..c2c8184
 +  	virtual ~CFloatingOverlay();
 +
 +    virtual void startFloating(const QPoint& DragStartMousePos, const QSize& Size,
-+        eDragState DragState, QWidget* MouseEventHandler);
++        ads::eDragState DragState, QWidget* MouseEventHandler);
 +
 +    virtual void moveFloating();
 +};

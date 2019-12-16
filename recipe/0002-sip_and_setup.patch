@@ -139,7 +139,7 @@ index 0000000..e235efb
 +%End
 \ No newline at end of file
 diff --git a/sip/FloatingDockContainer.sip b/sip/FloatingDockContainer.sip
-index ba30e6f..d307875 100644
+index ba30e6f..6f73b76 100644
 --- a/sip/FloatingDockContainer.sip
 +++ b/sip/FloatingDockContainer.sip
 @@ -5,7 +5,21 @@
@@ -155,7 +155,7 @@ index ba30e6f..d307875 100644
 +
 +public:
 +	virtual void startFloating(const QPoint& DragStartMousePos, const QSize& Size,
-+        ads::eDragState DragState, QWidget* MouseEventHandler);
++        ads::eDragState DragState, QWidget* MouseEventHandler) = 0;
 +
 +	virtual void moveFloating() = 0;
 +};

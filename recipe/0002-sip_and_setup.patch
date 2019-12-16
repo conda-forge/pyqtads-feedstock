@@ -1,0 +1,291 @@
+diff --git a/setup.py b/setup.py
+index 1918272..695fef9 100644
+--- a/setup.py
++++ b/setup.py
+@@ -14,8 +14,8 @@ from PyQt5.QtCore import PYQT_CONFIGURATION
+ from PyQt5.pyrcc_main import processResourceFile
+ 
+ MAJOR = 2
+-MINOR = 5
+-MICRO = 1
++MINOR = 7
++MICRO = 0
+ ISRELEASED = True
+ VERSION = '%d.%d.%d' % (MAJOR, MINOR, MICRO)
+ MODULE_NAME = "ads"
+diff --git a/sip/DockAreaTabBar.sip b/sip/DockAreaTabBar.sip
+index 09de7e1..a069f66 100644
+--- a/sip/DockAreaTabBar.sip
++++ b/sip/DockAreaTabBar.sip
+@@ -18,7 +18,7 @@ protected:
+ 	virtual void mouseMoveEvent(QMouseEvent* ev);
+ 	virtual void mouseDoubleClickEvent(QMouseEvent *event);
+ 	void startFloating(const QPoint& Offset);
+-	ads::CFloatingDockContainer* makeAreaFloating(const QPoint& Offset,
++	ads::IFloatingWidget* makeAreaFloating(const QPoint& Offset,
+ 		ads::eDragState DragState);
+     
+ public:
+diff --git a/sip/DockContainerWidget.sip b/sip/DockContainerWidget.sip
+index e6ec964..b226453 100644
+--- a/sip/DockContainerWidget.sip
++++ b/sip/DockContainerWidget.sip
+@@ -23,10 +23,11 @@ protected:
+ 	QSplitter* rootSplitter() const;
+ 	void createRootSplitter();
+ 	void dropFloatingWidget(ads::CFloatingDockContainer* FloatingWidget, const QPoint& TargetPos);
++    void dropWidget(QWidget* widget, const QPoint& TargetPos);
+ 	void addDockArea(ads::CDockAreaWidget* DockAreaWidget /Transfer/, ads::DockWidgetArea area = ads::CenterDockWidgetArea);
+ 	void removeDockArea(ads::CDockAreaWidget* area /Transfer/);
+ 	void saveState(QXmlStreamWriter& Stream) const;
+-	bool restoreState(QXmlStreamReader& Stream, bool Testing);
++	bool restoreState(CDockingStateReader& Stream, bool Testing);
+ 	ads::CDockAreaWidget* lastAddedDockAreaWidget(ads::DockWidgetArea area) const;
+ 	bool hasTopLevelDockWidget() const;
+ 	ads::CDockWidget* topLevelDockWidget() const;
+diff --git a/sip/DockManager.sip b/sip/DockManager.sip
+index 2ce20ca..ab2a03c 100644
+--- a/sip/DockManager.sip
++++ b/sip/DockManager.sip
+@@ -152,7 +152,13 @@ public:
+ 		TabCloseButtonIsToolButton,
+ 		AllTabsHaveCloseButton,
+ 		RetainTabSizeWhenCloseButtonHidden,
++        OpaqueUndocking,
++        DragPreviewIsDynamic,
++        DragPreviewShowsContentPixmap,
++        DragPreviewHasWindowFrame,
+ 		DefaultConfig,
++        DefaultNonOpaqueConfig,
++        NonOpaqueWithWindowFrame,
+ 	};
+     typedef QFlags<ads::CDockManager::eConfigFlag> ConfigFlags;
+ 
+@@ -161,20 +167,22 @@ public:
+ 	static ads::CDockManager::ConfigFlags configFlags();
+ 	static void setConfigFlags(const ads::CDockManager::ConfigFlags Flags);
+ 	static void setConfigFlag(ads::CDockManager::eConfigFlag Flag, bool On = true);
++    static ads::CIconProvider& iconProvider();
+ 	ads::CDockAreaWidget* addDockWidget(ads::DockWidgetArea area, ads::CDockWidget* Dockwidget /Transfer/,
+ 		ads::CDockAreaWidget* DockAreaWidget /Transfer/ = 0);
+ 	ads::CDockAreaWidget* addDockWidgetTab(ads::DockWidgetArea area,
+ 		ads::CDockWidget* Dockwidget /Transfer/);
+ 	ads::CDockAreaWidget* addDockWidgetTabToArea(ads::CDockWidget* Dockwidget /Transfer/,
+ 		ads::CDockAreaWidget* DockAreaWidget /Transfer/);
++    ads::CFloatingDockContainer* addDockWidgetFloating(ads::CDockWidget* DockWidget /Transfer/);
+ 	ads::CDockWidget* findDockWidget(const QString& ObjectName) const;
+ 	void removeDockWidget(ads::CDockWidget* Dockwidget) /TransferBack/;
+ 	QMap<QString, ads::CDockWidget*> dockWidgetsMap() const;
+ 	const QList<ads::CDockContainerWidget*> dockContainers() const;
+ 	const QList<ads::CFloatingDockContainer*> floatingWidgets() const;
+ 	virtual unsigned int zOrderIndex() const;
+-	QByteArray saveState(int version = 0) const;
+-	bool restoreState(const QByteArray &state, int version = 0);
++	QByteArray saveState(int version = 1) const;
++	bool restoreState(const QByteArray &state, int version = 1);
+ 	void addPerspective(const QString& UniquePrespectiveName);
+ 	void removePerspective(const QString& Name);
+ 	void removePerspectives(const QStringList& Names);
+@@ -198,8 +206,9 @@ signals:
+     void stateRestored();
+     void openingPerspective(const QString& PerspectiveName);
+     void perspectiveOpened(const QString& PerspectiveName);
++    void dockAreaCreated(ads::CDockAreaWidget* DockArea);
+ };
+ 
+ };
+ 
+-%End
+\ No newline at end of file
++%End
+diff --git a/sip/DockWidget.sip b/sip/DockWidget.sip
+index 9dfb78e..e2f6d34 100644
+--- a/sip/DockWidget.sip
++++ b/sip/DockWidget.sip
+@@ -88,6 +88,7 @@ public:
+ 
+ public slots:
+ 	void toggleView(bool Open = true);
++    void setFloating();
+ 
+ signals:
+ 	void viewToggled(bool Open);
+diff --git a/sip/DockingStateReader.sip b/sip/DockingStateReader.sip
+new file mode 100644
+index 0000000..e235efb
+--- /dev/null
++++ b/sip/DockingStateReader.sip
+@@ -0,0 +1,21 @@
++%If (Qt_5_0_0 -)
++
++namespace ads
++{
++
++class CDockingStateReader : QXmlStreamReader
++{
++
++    %TypeHeaderCode
++    #include <DockingStateReader.h>
++    %End
++
++
++public:
++	void setFileVersion(int FileVersion);
++	int fileVersion() const;
++};
++
++};
++
++%End
+\ No newline at end of file
+diff --git a/sip/FloatingDockContainer.sip b/sip/FloatingDockContainer.sip
+index ba30e6f..6f73b76 100644
+--- a/sip/FloatingDockContainer.sip
++++ b/sip/FloatingDockContainer.sip
+@@ -5,7 +5,21 @@
+ namespace ads
+ {
+ 
+-class CFloatingDockContainer : QWidget
++class IFloatingWidget
++{
++    %TypeHeaderCode
++    #include <FloatingDockContainer.h>
++    %End
++
++public:
++	virtual void startFloating(const QPoint& DragStartMousePos, const QSize& Size,
++        ads::eDragState DragState, QWidget* MouseEventHandler) = 0;
++
++	virtual void moveFloating() = 0;
++};
++
++
++class CFloatingDockContainer : QWidget, ads::IFloatingWidget
+ {
+     
+     %TypeHeaderCode
+@@ -20,7 +34,7 @@ protected:
+ 	void finishDragging();
+ 	void initFloatingGeometry(const QPoint& DragStartMousePos, const QSize& Size);
+ 	void moveFloating();
+-	bool restoreState(QXmlStreamReader& Stream, bool Testing);
++	bool restoreState(ads::CDockingStateReader& Stream, bool Testing);
+ 	void updateWindowTitle();
+ 
+ 
+diff --git a/sip/FloatingOverlay.sip b/sip/FloatingOverlay.sip
+new file mode 100644
+index 0000000..9aa799c
+--- /dev/null
++++ b/sip/FloatingOverlay.sip
+@@ -0,0 +1,30 @@
++%Import QtWidgets/QtWidgetsmod.sip
++
++%If (Qt_5_0_0 -)
++
++namespace ads
++{
++
++class CFloatingOverlay : QWidget, ads::IFloatingWidget
++{
++
++    %TypeHeaderCode
++    #include <FloatingOverlay.h>
++    %End
++
++
++public:
++    CFloatingOverlay(ads::CDockWidget* Content /TransferThis/ );
++    CFloatingOverlay(ads::CDockAreaWidget* Content /TransferThis/ );
++
++  	virtual ~CFloatingOverlay();
++
++    virtual void startFloating(const QPoint& DragStartMousePos, const QSize& Size,
++        ads::eDragState DragState, QWidget* MouseEventHandler);
++
++    virtual void moveFloating();
++};
++
++};
++
++%End
+\ No newline at end of file
+diff --git a/sip/IconProvider.sip b/sip/IconProvider.sip
+new file mode 100644
+index 0000000..e271651
+--- /dev/null
++++ b/sip/IconProvider.sip
+@@ -0,0 +1,28 @@
++%Import QtWidgets/QtWidgetsmod.sip
++
++%If (Qt_5_0_0 -)
++
++namespace ads
++{
++
++class CIconProvider
++{
++
++    %TypeHeaderCode
++    #include <IconProvider.h>
++    %End
++
++
++public:
++    CIconProvider();
++
++  	virtual ~CIconProvider();
++
++    QIcon customIcon(eIcon IconId);
++
++    void registerCustomIcon(eIcon IconId, const QIcon& icon /TransferThis/ );
++};
++
++};
++
++%End
+\ No newline at end of file
+diff --git a/sip/ads.sip b/sip/ads.sip
+index 8f71957..31b8aa2 100644
+--- a/sip/ads.sip
++++ b/sip/ads.sip
+@@ -9,12 +9,15 @@
+ %Include DockAreaTitleBar.sip
+ %Include DockAreaWidget.sip
+ %Include DockContainerWidget.sip
++%Include DockingStateReader.sip
+ %Include DockManager.sip
+ %Include DockOverlay.sip
+ %Include DockSplitter.sip
+ %Include DockWidgetTab.sip
+ %Include ElidingLabel.sip
+ %Include FloatingDockContainer.sip
++%Include FloatingOverlay.sip
++%Include IconProvider.sip
+ %If (Linux)
+     %Include linux/FloatingWidgetTitleBar.sip
+ %End
+\ No newline at end of file
+diff --git a/sip/ads_globals.sip b/sip/ads_globals.sip
+index b9451d5..a60f5ec 100644
+--- a/sip/ads_globals.sip
++++ b/sip/ads_globals.sip
+@@ -39,6 +39,16 @@ namespace ads
+         DraggingFloatingWidget
+     };
+ 
++    enum eIcon
++    {
++        TabCloseIcon,
++        DockAreaMenuIcon,
++        DockAreaUndockIcon,
++        DockAreaCloseIcon,
++
++        IconCount,
++    };
++
+ };
+ 
+ %End
+\ No newline at end of file

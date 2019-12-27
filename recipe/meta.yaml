@@ -10,7 +10,6 @@ source:
   sha256: 8c5bad1428ad1d1ffdfddda93132f68e42f9eb04d60d29a39f21a7a229a94dcb
   patches:
     - 0001-setup.patch
-    - 0002-sip_and_setup.patch
 
 build:
   number: 0

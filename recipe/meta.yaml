@@ -23,13 +23,13 @@ requirements:
   host:
     - python
     - pip
-    - pyqt >=5.9
+    - pyqt 5.12.*
     - qt 5.12.*
     - setuptools
     - sip >=4.19
   run:
     - python
-    - pyqt >=5.9
+    - pyqt 5.12.*
     - pywin32   # [win]
     - qt 5.12.*
     - sip >=4.19
@@ -42,7 +42,7 @@ about:
   home: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System
   license: LGPLv2+
   license_family: LGPL
-  license_file: LICENSE.md
+  license_file: LICENSE
   summary: Advanced Docking System for Qt
 
   description: Advanced Docking System for Qt

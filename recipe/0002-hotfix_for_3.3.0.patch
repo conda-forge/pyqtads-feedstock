@@ -1,0 +1,44 @@
+diff --git a/sip/DockManager.sip b/sip/DockManager.sip
+index 19873e6..7a6d5e7 100644
+--- a/sip/DockManager.sip
++++ b/sip/DockManager.sip
+@@ -165,12 +165,12 @@ public:
+ 		DockAreaDynamicTabsMenuButtonVisibility,
+ 		FloatingContainerHasWidgetTitle,
+ 		FloatingContainerHasWidgetIcon,
++		HideSingleCentralWidgetTitleBar,
+         DefaultDockAreaButtons,
+ 		DefaultBaseConfig,
+         DefaultOpaqueConfig,
+ 		DefaultNonOpaqueConfig,
+ 		NonOpaqueWithWindowFrame,
+-		HideSingleCentralWidgetTitleBar,
+ 	};
+     typedef QFlags<ads::CDockManager::eConfigFlag> ConfigFlags;
+ 
+diff --git a/sip/DockWidgetTab.sip b/sip/DockWidgetTab.sip
+index f6c2453..d32a1d2 100644
+--- a/sip/DockWidgetTab.sip
++++ b/sip/DockWidgetTab.sip
+@@ -33,7 +33,7 @@ public:
+ 	bool isTitleElided() const;
+ 	bool isClosable() const;
+ 	virtual bool event(QEvent *e);
+-
++	void setElideMode(Qt::TextElideMode mode);
+ 
+ public slots:
+ 	virtual void setVisible(bool visible);
+diff --git a/sip/ads_globals.sip b/sip/ads_globals.sip
+index 66b0dbe..ea78457 100644
+--- a/sip/ads_globals.sip
++++ b/sip/ads_globals.sip
+@@ -10,7 +10,7 @@ namespace ads
+ 
+     enum eStateFileVersion
+     {
+-        InitialVerison,
++        InitialVersion,
+         Version1,
+         CurrentVersion
+     };

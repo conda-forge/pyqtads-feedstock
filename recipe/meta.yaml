@@ -10,7 +10,8 @@ source:
   sha256: 428a70627632ce2bc037adaf89601ccf93e1434af5b2faf20b8737abf08ed21a
   patches:
     - 0001-setup.patch
-
+    - 0002-hotfix_for_3.4.0.patch
+    
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . -vv
@@ -26,17 +27,15 @@ requirements:
     - pyqt 5.12.*
     - qt 5.12.*
     - setuptools
-    - sip >=4.19
   run:
     - python
     - pyqt 5.12.*
     - pywin32   # [win]
     - qt 5.12.*
-    - sip >=4.19
 
 test:
   imports:
-    - PyQtAds
+    - PyQtAds.QtAds
 
 about:
   home: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System

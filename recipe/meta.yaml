@@ -1,5 +1,5 @@
 {% set name = "pyqtads" %}
-{% set version = "3.2.6" %}
+{% set version = "3.3.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,9 +7,10 @@ package:
 
 source:
   url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/{{ version }}.tar.gz
-  sha256: f3c2f3147b4e5b4041608de76424fc0716851a51acd54ce9dcd3a586e1cadd45
+  sha256: 1c3f275efb90da41d076ca1118aaaaeb6649536f829fac0af4c7a8b574001e8b
   patches:
     - 0001-setup.patch
+    - 0002-hotfix_for_3.3.0.patch
 
 build:
   number: 0
@@ -44,7 +45,6 @@ about:
   license_family: LGPL
   license_file: LICENSE
   summary: Advanced Docking System for Qt
-
   description: Advanced Docking System for Qt
   dev_url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System
 

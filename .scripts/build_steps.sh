@@ -19,12 +19,20 @@ conda-build:
 
 CONDARC
 
-conda install --yes --quiet conda-forge-ci-setup=2 conda-build -c conda-forge
+conda install --yes --quiet conda-forge-ci-setup=3 conda-build pip -c conda-forge
 
 # set up the condarc
 setup_conda_rc "${FEEDSTOCK_ROOT}" "${RECIPE_ROOT}" "${CONFIG_FILE}"
 
 source run_conda_forge_build_setup
+
+
+# Install the yum requirements defined canonically in the
+# "recipe/yum_requirements.txt" file. After updating that file,
+# run "conda smithy rerender" and this line will be updated
+# automatically.
+/usr/bin/sudo -n yum install -y mesa-libGL mesa-dri-drivers libselinux libXdamage libXxf86vm libXext
+
 
 # make the build number clobber
 make_build_number "${FEEDSTOCK_ROOT}" "${RECIPE_ROOT}" "${CONFIG_FILE}"

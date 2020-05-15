@@ -1,5 +1,5 @@
 {% set name = "pyqtads" %}
-{% set version = "3.3.0" %}
+{% set version = "3.4.0" %}
 
 package:
   name: {{ name|lower }}
@@ -7,11 +7,11 @@ package:
 
 source:
   url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/{{ version }}.tar.gz
-  sha256: 1c3f275efb90da41d076ca1118aaaaeb6649536f829fac0af4c7a8b574001e8b
+  sha256: 6e073efc8615f04579d1e1350cb157378f99c17aaed538ac5014ec026a45e1d6
   patches:
     - 0001-setup.patch
-    - 0002-hotfix_for_3.3.0.patch
-
+    - 0002-hotfix_for_3.4.0.patch
+    
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . -vv
@@ -21,23 +21,28 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ cdt('mesa-libgl-devel') }}  # [linux]
+    - {{ cdt('mesa-dri-drivers') }}  # [linux]
+    - {{ cdt('libselinux') }}  # [linux]
+    - {{ cdt('libxdamage') }}  # [linux]
+    - {{ cdt('libxxf86vm') }}  # [linux]
+    - {{ cdt('libxext') }}     # [linux]
   host:
     - python
     - pip
     - pyqt 5.12.*
     - qt 5.12.*
     - setuptools
-    - sip >=4.19
+    - xorg-libxfixes  # [linux]
   run:
     - python
     - pyqt 5.12.*
     - pywin32   # [win]
     - qt 5.12.*
-    - sip >=4.19
 
 test:
   imports:
-    - PyQtAds
+    - PyQtAds.QtAds
 
 about:
   home: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System

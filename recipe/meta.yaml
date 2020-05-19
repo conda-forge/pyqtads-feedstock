@@ -10,7 +10,6 @@ source:
   sha256: f01e81bb2b3759f53fd91a5699ada09c3a9bd903e159a25460a88f18a3fa828a
   patches:
     - 0001-setup.patch
-    - 0002-hotfix_for_3.4.0.patch
 
 build:
   number: 0

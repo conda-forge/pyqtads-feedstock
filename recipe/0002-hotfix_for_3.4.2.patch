@@ -1,3 +1,46 @@
+diff --git a/sip/DockAreaTitleBar_p.sip b/sip/DockAreaTitleBar_p.sip
+new file mode 100644
+index 0000000..8f85e46
+--- /dev/null
++++ b/sip/DockAreaTitleBar_p.sip
+@@ -0,0 +1,37 @@
++%Import QtWidgets/QtWidgetsmod.sip
++
++%If (Qt_5_0_0 -)
++
++namespace ads
++{
++
++class CTitleBarButton : QToolButton
++{
++    %TypeHeaderCode
++    #include <DockAreaTitleBar_p.h>
++    %End
++
++protected:
++    bool event(QEvent *ev);
++
++public:
++    CTitleBarButton(bool visible = true, QWidget* parent /TransferThis/ = Q_NULLPTR );
++    virtual void setVisible(bool visible);
++};
++
++
++class CSpacerWidget : QWidget
++{
++    %TypeHeaderCode
++    #include <DockAreaTitleBar_p.h>
++    %End
++
++public:
++	CSpacerWidget(QWidget* Parent /TransferThis/ = Q_NULLPTR );
++	virtual QSize sizeHint() const;
++	virtual QSize minimumSizeHint() const;
++};
++
++};
++
++%End
 diff --git a/sip/DockAreaWidget.sip b/sip/DockAreaWidget.sip
 index e105f69..dbe1c7e 100644
 --- a/sip/DockAreaWidget.sip

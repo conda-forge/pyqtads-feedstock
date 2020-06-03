@@ -1,0 +1,89 @@
+diff --git a/sip/DockAreaTitleBar_p.sip b/sip/DockAreaTitleBar_p.sip
+new file mode 100644
+index 0000000..002f0f6
+--- /dev/null
++++ b/sip/DockAreaTitleBar_p.sip
+@@ -0,0 +1,36 @@
++%Import QtWidgets/QtWidgetsmod.sip
++
++%If (Qt_5_0_0 -)
++
++namespace ads
++{
++
++class CTitleBarButton : QToolButton
++{
++    %TypeHeaderCode
++    #include <DockAreaTitleBar_p.h>
++    %End
++
++protected:
++    bool event(QEvent *ev);
++
++public:
++    CTitleBarButton(bool visible = true, QWidget* parent = nullptr /TransferThis/);
++    virtual void setVisible(bool visible);
++}
++
++
++class CSpacerWidget : QWidget
++{
++    %TypeHeaderCode
++    #include <DockAreaTitleBar_p.h>
++    %End
++
++public:
++	CSpacerWidget(QWidget* Parent = 0 /TransferThis/);
++	virtual QSize sizeHint() const;
++	virtual QSize minimumSizeHint() const;
++};
++
++
++%End
+diff --git a/sip/DockAreaWidget.sip b/sip/DockAreaWidget.sip
+index e105f69..32fb35c 100644
+--- a/sip/DockAreaWidget.sip
++++ b/sip/DockAreaWidget.sip
+@@ -32,6 +32,7 @@ public:
+ 	virtual ~CDockAreaWidget();
+ 	ads::CDockManager* dockManager() const;
+ 	ads::CDockContainerWidget* dockContainer() const;
++	virtual QSize minimumSizeHint() const;
+ 	QRect titleBarGeometry() const;
+ 	QRect contentAreaGeometry() const;
+ 	int dockWidgetsCount() const;
+diff --git a/sip/FloatingDockContainer.sip b/sip/FloatingDockContainer.sip
+index 38c4ab6..4f48ff4 100644
+--- a/sip/FloatingDockContainer.sip
++++ b/sip/FloatingDockContainer.sip
+@@ -27,6 +27,7 @@ public:
+ 
+ 	virtual void moveFloating() = 0;
+ 	virtual void finishDragging() = 0;
++	virtual ~IFloatingWidget();
+ };
+ 
+ 
+@@ -56,6 +57,10 @@ protected:
+ 	virtual void closeEvent(QCloseEvent *event);
+ 	virtual void hideEvent(QHideEvent *event);
+ 	virtual void showEvent(QShowEvent *event);
++	%If (WS_WIN)
++	virtual bool nativeEvent(QByteArray& eventType, void *message, long *result);
++	%End
++
+ 
+ public:
+ 	CFloatingDockContainer(ads::CDockManager* DockManager /TransferThis/);
+diff --git a/sip/FloatingDragPreview.sip b/sip/FloatingDragPreview.sip
+index 659af35..9a76e0b 100644
+--- a/sip/FloatingDragPreview.sip
++++ b/sip/FloatingDragPreview.sip
+@@ -13,7 +13,6 @@ class CFloatingDragPreview : QWidget, ads::IFloatingWidget
+     %End
+ 
+ protected:
+-	virtual void moveEvent(QMoveEvent *event);
+ 	virtual void paintEvent(QPaintEvent *e);
+ 	CFloatingDragPreview(QWidget* Content /TransferThis/, QWidget* parent /TransferThis/);
+ 

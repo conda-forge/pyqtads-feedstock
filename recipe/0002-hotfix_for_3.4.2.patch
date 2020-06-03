@@ -1,49 +1,16 @@
-diff --git a/sip/DockAreaTitleBar_p.sip b/sip/DockAreaTitleBar_p.sip
-new file mode 100644
-index 0000000..002f0f6
---- /dev/null
-+++ b/sip/DockAreaTitleBar_p.sip
-@@ -0,0 +1,36 @@
-+%Import QtWidgets/QtWidgetsmod.sip
-+
-+%If (Qt_5_0_0 -)
-+
-+namespace ads
-+{
-+
-+class CTitleBarButton : QToolButton
-+{
-+    %TypeHeaderCode
-+    #include <DockAreaTitleBar_p.h>
-+    %End
-+
-+protected:
-+    bool event(QEvent *ev);
-+
-+public:
-+    CTitleBarButton(bool visible = true, QWidget* parent = nullptr /TransferThis/);
-+    virtual void setVisible(bool visible);
-+}
-+
-+
-+class CSpacerWidget : QWidget
-+{
-+    %TypeHeaderCode
-+    #include <DockAreaTitleBar_p.h>
-+    %End
-+
-+public:
-+	CSpacerWidget(QWidget* Parent = 0 /TransferThis/);
-+	virtual QSize sizeHint() const;
-+	virtual QSize minimumSizeHint() const;
-+};
-+
-+
-+%End
 diff --git a/sip/DockAreaWidget.sip b/sip/DockAreaWidget.sip
-index e105f69..32fb35c 100644
+index e105f69..dbe1c7e 100644
 --- a/sip/DockAreaWidget.sip
 +++ b/sip/DockAreaWidget.sip
+@@ -4,7 +4,7 @@
+ 
+ namespace ads
+ {
+-    
++
+ class CDockAreaWidget : QFrame
+ {
+ 
 @@ -32,6 +32,7 @@ public:
  	virtual ~CDockAreaWidget();
  	ads::CDockManager* dockManager() const;
@@ -88,14 +55,14 @@ index 659af35..9a76e0b 100644
  	CFloatingDragPreview(QWidget* Content /TransferThis/, QWidget* parent /TransferThis/);
  
 diff --git a/sip/ads.sip b/sip/ads.sip
-index fe92502..d20fc8f 100644
+index fe92502..8da5d64 100644
 --- a/sip/ads.sip
 +++ b/sip/ads.sip
-@@ -6,6 +6,7 @@
+@@ -5,6 +5,7 @@
+ %Include ads_globals.sip
  %Include DockWidget.sip
  %Include DockAreaTabBar.sip
- %Include DockAreaTitleBar.sip
 +%Include DockAreaTitleBar_p.sip
+ %Include DockAreaTitleBar.sip
  %Include DockAreaWidget.sip
  %Include DockComponentsFactory.sip
- %Include DockContainerWidget.sip

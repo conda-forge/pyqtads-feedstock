@@ -87,3 +87,15 @@ index 659af35..9a76e0b 100644
  	virtual void paintEvent(QPaintEvent *e);
  	CFloatingDragPreview(QWidget* Content /TransferThis/, QWidget* parent /TransferThis/);
  
+diff --git a/sip/ads.sip b/sip/ads.sip
+index fe92502..d20fc8f 100644
+--- a/sip/ads.sip
++++ b/sip/ads.sip
+@@ -6,6 +6,7 @@
+ %Include DockWidget.sip
+ %Include DockAreaTabBar.sip
+ %Include DockAreaTitleBar.sip
++%Include DockAreaTitleBar_p.sip
+ %Include DockAreaWidget.sip
+ %Include DockComponentsFactory.sip
+ %Include DockContainerWidget.sip

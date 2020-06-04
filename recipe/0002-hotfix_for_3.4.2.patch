@@ -106,7 +106,7 @@ index e105f69..dbe1c7e 100644
  	QRect contentAreaGeometry() const;
  	int dockWidgetsCount() const;
 diff --git a/sip/FloatingDockContainer.sip b/sip/FloatingDockContainer.sip
-index 38c4ab6..581afd4 100644
+index 38c4ab6..4e80db5 100644
 --- a/sip/FloatingDockContainer.sip
 +++ b/sip/FloatingDockContainer.sip
 @@ -27,6 +27,7 @@ public:
@@ -122,7 +122,7 @@ index 38c4ab6..581afd4 100644
  	virtual void hideEvent(QHideEvent *event);
  	virtual void showEvent(QShowEvent *event);
 +	%If (WS_WIN)
-+	virtual bool nativeEvent(QByteArray &eventType, void *message, long *result);
++	virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result);
 +	%End
 +
  

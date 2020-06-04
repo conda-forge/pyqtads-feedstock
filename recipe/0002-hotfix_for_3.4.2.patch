@@ -1,0 +1,154 @@
+diff --git a/setup.py b/setup.py
+index 2e0d0d6..52e5616 100644
+--- a/setup.py
++++ b/setup.py
+@@ -214,6 +214,7 @@ class build_ext(sipdistutils.build_ext):
+         # /usr/bin/rcc -name ads ../../Qt-Advanced-Docking-System/src/ads.qrc -o release/qrc_ads.cpp
+         
+         cppsources = [source for source in ext.sources if source.endswith(".cpp")]
++        headersources = ['src/DockAreaTitleBar_p.h']
+ 
+         dir_util.mkpath(self.build_temp, dry_run=self.dry_run)
+ 
+@@ -247,6 +248,30 @@ class build_ext(sipdistutils.build_ext):
+                 if os.path.getsize(out_file) > 0:
+                     ext.sources.append(out_file)
+ 
++        # Run moc on all orphan header files.
++        for source in headersources:
++            # *.cpp -> *.moc
++            moc_file = os.path.basename(source).replace(".h", ".moc")
++            out_file = os.path.join(self.build_temp, moc_file)
++
++            if newer(source, out_file) or self.force:
++                spawn.spawn(get_moc_args(out_file, source),
++                            dry_run=self.dry_run)
++
++            header = source
++            if os.path.exists(header):
++                # *.h -> moc_*.cpp
++                moc_file = "moc_" + os.path.basename(header).replace(
++                    ".h", ".cpp")
++                out_file = os.path.join(self.build_temp, moc_file)
++
++                if newer(header, out_file) or self.force:
++                    spawn.spawn(get_moc_args(out_file, header),
++                                dry_run=self.dry_run)
++
++                if os.path.getsize(out_file) > 0:
++                    ext.sources.append(out_file)
++
+         # Add the temp build directory to include path, for compiler to find
+         # the created .moc files
+         ext.include_dirs += [self._sip_output_dir()]
+diff --git a/sip/DockAreaTitleBar_p.sip b/sip/DockAreaTitleBar_p.sip
+new file mode 100644
+index 0000000..0ae3339
+--- /dev/null
++++ b/sip/DockAreaTitleBar_p.sip
+@@ -0,0 +1,37 @@
++%Import QtWidgets/QtWidgetsmod.sip
++
++%If (Qt_5_0_0 -)
++
++namespace ads
++{
++
++class CTitleBarButton : QToolButton
++{
++    %TypeHeaderCode
++    #include <DockAreaTitleBar_p.h>
++    %End
++
++protected:
++    bool event(QEvent *ev);
++
++public:
++    CTitleBarButton(bool visible = true, QWidget* parent /TransferThis/ = Q_NULLPTR );
++    virtual void setVisible(bool visible);
++};
++
++
++class CSpacerWidget : QWidget
++{
++    %TypeHeaderCode
++    #include <DockAreaTitleBar_p.h>
++    %End
++
++public:
++	CSpacerWidget(QWidget* Parent /TransferThis/ = 0 );
++	virtual QSize sizeHint() const;
++	virtual QSize minimumSizeHint() const;
++};
++
++};
++
++%End
+diff --git a/sip/DockAreaWidget.sip b/sip/DockAreaWidget.sip
+index e105f69..dbe1c7e 100644
+--- a/sip/DockAreaWidget.sip
++++ b/sip/DockAreaWidget.sip
+@@ -4,7 +4,7 @@
+ 
+ namespace ads
+ {
+-    
++
+ class CDockAreaWidget : QFrame
+ {
+ 
+@@ -32,6 +32,7 @@ public:
+ 	virtual ~CDockAreaWidget();
+ 	ads::CDockManager* dockManager() const;
+ 	ads::CDockContainerWidget* dockContainer() const;
++	virtual QSize minimumSizeHint() const;
+ 	QRect titleBarGeometry() const;
+ 	QRect contentAreaGeometry() const;
+ 	int dockWidgetsCount() const;
+diff --git a/sip/FloatingDockContainer.sip b/sip/FloatingDockContainer.sip
+index 38c4ab6..4e80db5 100644
+--- a/sip/FloatingDockContainer.sip
++++ b/sip/FloatingDockContainer.sip
+@@ -27,6 +27,7 @@ public:
+ 
+ 	virtual void moveFloating() = 0;
+ 	virtual void finishDragging() = 0;
++	virtual ~IFloatingWidget();
+ };
+ 
+ 
+@@ -56,6 +57,10 @@ protected:
+ 	virtual void closeEvent(QCloseEvent *event);
+ 	virtual void hideEvent(QHideEvent *event);
+ 	virtual void showEvent(QShowEvent *event);
++	%If (WS_WIN)
++	virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result);
++	%End
++
+ 
+ public:
+ 	CFloatingDockContainer(ads::CDockManager* DockManager /TransferThis/);
+diff --git a/sip/FloatingDragPreview.sip b/sip/FloatingDragPreview.sip
+index 659af35..9a76e0b 100644
+--- a/sip/FloatingDragPreview.sip
++++ b/sip/FloatingDragPreview.sip
+@@ -13,7 +13,6 @@ class CFloatingDragPreview : QWidget, ads::IFloatingWidget
+     %End
+ 
+ protected:
+-	virtual void moveEvent(QMoveEvent *event);
+ 	virtual void paintEvent(QPaintEvent *e);
+ 	CFloatingDragPreview(QWidget* Content /TransferThis/, QWidget* parent /TransferThis/);
+ 
+diff --git a/sip/ads.sip b/sip/ads.sip
+index fe92502..8da5d64 100644
+--- a/sip/ads.sip
++++ b/sip/ads.sip
+@@ -5,6 +5,7 @@
+ %Include ads_globals.sip
+ %Include DockWidget.sip
+ %Include DockAreaTabBar.sip
++%Include DockAreaTitleBar_p.sip
+ %Include DockAreaTitleBar.sip
+ %Include DockAreaWidget.sip
+ %Include DockComponentsFactory.sip

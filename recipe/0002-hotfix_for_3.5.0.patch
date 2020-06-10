@@ -1,0 +1,128 @@
+diff --git a/setup.py b/setup.py
+index 52e5616..f093d89 100644
+--- a/setup.py
++++ b/setup.py
+@@ -159,6 +159,13 @@ class build_ext(sipdistutils.build_ext):
+             return sip_bin
+ 
+         raise SystemExit('Could not find PyQt SIP binary.')
++        
++    def _sip_sipfiles_dir(self):
++        sip_dir = super()._sip_sipfiles_dir()
++        if os.path.exists(sip_dir):
++            return sip_dir
++        
++        return os.path.join(sys.prefix, 'sip', 'PyQt5')
+ 
+     def _sip_compile(self, sip_bin, source, sbf):
+         cmd = [sip_bin]
+@@ -210,9 +217,7 @@ class build_ext(sipdistutils.build_ext):
+ 
+         return super().swig_sources(sources, extension)
+ 
+-    def build_extension(self, ext):
+-        # /usr/bin/rcc -name ads ../../Qt-Advanced-Docking-System/src/ads.qrc -o release/qrc_ads.cpp
+-        
++    def build_extension(self, ext):        
+         cppsources = [source for source in ext.sources if source.endswith(".cpp")]
+         headersources = ['src/DockAreaTitleBar_p.h']
+ 
+diff --git a/sip/DockFocusController.sip b/sip/DockFocusController.sip
+new file mode 100644
+index 0000000..7d8edfd
+--- /dev/null
++++ b/sip/DockFocusController.sip
+@@ -0,0 +1,31 @@
++%Import QtWidgets/QtWidgetsmod.sip
++
++%If (Qt_5_0_0 -)
++
++namespace ads
++{
++
++/**
++ * Manages focus styling of dock widgets and handling of focus changes
++ */
++class CDockFocusController : QObject
++{
++    %TypeHeaderCode
++    #include <DockFocusController.h>
++    %End
++    
++public:
++	CDockFocusController(ads::CDockManager* DockManager);
++	virtual ~CDockFocusController();
++
++	void notifyWidgetOrAreaRelocation(QWidget* RelocatedWidget);
++	void notifyFloatingWidgetDrop(ads::CFloatingDockContainer* FloatingWidget);
++
++public slots:
++	void setDockWidgetFocused(ads::CDockWidget* focusedNow);
++    
++}; // class DockFocusController
++};
++ // namespace ads
++ 
++%End
+\ No newline at end of file
+diff --git a/sip/DockManager.sip b/sip/DockManager.sip
+index dcb9cbf..c8f04b0 100644
+--- a/sip/DockManager.sip
++++ b/sip/DockManager.sip
+@@ -133,6 +133,8 @@ protected:
+ 	void removeDockContainer(ads::CDockContainerWidget* DockContainer /TransferBack/);
+ 	ads::CDockOverlay* containerOverlay() const;
+ 	ads::CDockOverlay* dockAreaOverlay() const;
++    void notifyWidgetOrAreaRelocation(QWidget* RelocatedWidget);
++    void notifyFloatingWidgetDrop(ads::CFloatingDockContainer* FloatingWidget);
+ 
+     virtual void showEvent(QShowEvent *event);
+ 
+@@ -166,6 +168,7 @@ public:
+ 		FloatingContainerHasWidgetTitle,
+ 		FloatingContainerHasWidgetIcon,
+ 		HideSingleCentralWidgetTitleBar,
++        FocusHighlighting,
+         DefaultDockAreaButtons,
+ 		DefaultBaseConfig,
+         DefaultOpaqueConfig,
+@@ -211,6 +214,7 @@ public:
+ 
+ public slots:
+ 	void openPerspective(const QString& PerspectiveName);
++    void setDockWidgetFocused(ads::CDockWidget* DockWidget);
+ 
+ signals:
+ 	void perspectiveListChanged();
+@@ -223,6 +227,7 @@ signals:
+     void dockAreaCreated(ads::CDockAreaWidget* DockArea);
+     void dockWidgetAboutToBeRemoved(ads::CDockWidget* DockWidget);
+     void dockWidgetRemoved(ads::CDockWidget* DockWidget);
++    void focusedDockWidgetChanged(ads::CDockWidget* old, ads::CDockWidget* now);
+ };
+ 
+ };
+diff --git a/sip/DockWidgetTab.sip b/sip/DockWidgetTab.sip
+index d32a1d2..32d819b 100644
+--- a/sip/DockWidgetTab.sip
++++ b/sip/DockWidgetTab.sip
+@@ -34,6 +34,7 @@ public:
+ 	bool isClosable() const;
+ 	virtual bool event(QEvent *e);
+ 	void setElideMode(Qt::TextElideMode mode);
++    void updateStyle();
+ 
+ public slots:
+ 	virtual void setVisible(bool visible);
+diff --git a/sip/ads.sip b/sip/ads.sip
+index 8da5d64..b7cd572 100644
+--- a/sip/ads.sip
++++ b/sip/ads.sip
+@@ -11,6 +11,7 @@
+ %Include DockComponentsFactory.sip
+ %Include DockContainerWidget.sip
+ %Include DockingStateReader.sip
++%Include DockFocusController.sip
+ %Include DockManager.sip
+ %Include DockOverlay.sip
+ %Include DockSplitter.sip

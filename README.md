@@ -5,7 +5,7 @@ Home: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System
 
 Package license: LGPLv2+
 
-Feedstock license: BSD 3-Clause
+Feedstock license: BSD-3-Clause
 
 Summary: Advanced Docking System for Qt
 

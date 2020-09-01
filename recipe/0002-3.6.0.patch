@@ -1,0 +1,178 @@
+diff --git a/setup.py b/setup.py
+index 1986df7..31546a9 100644
+--- a/setup.py
++++ b/setup.py
+@@ -227,7 +227,9 @@ class build_ext(sipdistutils.build_ext):
+                 extension.extra_link_args += ['-F' + self.qtconfig.QT_INSTALL_LIBS,
+                     '-mmacosx-version-min=10.9']
+             elif sys.platform == 'linux':
+-                extension.extra_compile_args += ['-std=c++11']
++                extension.extra_compile_args += ['-D', 'QT_X11EXTRAS_LIB', '-std=c++11']
++                extension.include_dirs += [os.path.join(self.qt_include_dir, 'QtX11Extras')]
++                extension.libraries += ['Qt5X11Extras' + self.qt_libinfix]
+ 
+         return super().swig_sources(sources, extension)
+ 
+diff --git a/sip/DockAreaWidget.sip b/sip/DockAreaWidget.sip
+index f7f1e4a..8196047 100644
+--- a/sip/DockAreaWidget.sip
++++ b/sip/DockAreaWidget.sip
+@@ -28,6 +28,13 @@ protected slots:
+ 	void toggleView(bool Open);
+     
+ public:
++    enum eDockAreaFlag
++	{
++		HideSingleWidgetTitleBar,
++		DefaultFlags
++	};
++    typedef QFlags<ads::CDockAreaWidget::eDockAreaFlag> DockAreaFlags;
++    
+ 	CDockAreaWidget(ads::CDockManager* DockManager /TransferThis/, ads::CDockContainerWidget* parent /TransferThis/);
+ 	virtual ~CDockAreaWidget();
+ 	ads::CDockManager* dockManager() const;
+@@ -51,8 +58,13 @@ public:
+ 
+ 	void setAllowedAreas(DockWidgetAreas areas);
+ 	DockWidgetAreas allowedAreas() const;
+-	void setHideSingleWidgetTitleBar(bool hide);
+ 	CDockAreaTitleBar* titleBar() const;
++    
++    DockAreaFlags dockAreaFlags() const;
++    void setDockAreaFlags(DockAreaFlags Flags);
++    void setDockAreaFlag(eDockAreaFlag Flag, bool On);
++    
++    bool isCentralWidgetArea() const;
+ 
+ public slots:
+ 	void setCurrentIndex(int index);
+diff --git a/sip/DockContainerWidget.sip b/sip/DockContainerWidget.sip
+index ae90e3c..be8e6d7 100644
+--- a/sip/DockContainerWidget.sip
++++ b/sip/DockContainerWidget.sip
+@@ -32,6 +32,7 @@ protected:
+ 	ads::CDockWidget* topLevelDockWidget() const;
+ 	ads::CDockAreaWidget* topLevelDockArea() const;
+     QList<ads::CDockWidget*> dockWidgets() const;
++    void updateSplitterHandles(QSplitter* splitter);
+     
+ public:
+ 	/**
+diff --git a/sip/DockManager.sip b/sip/DockManager.sip
+index d5d2f7a..0f35a5c 100644
+--- a/sip/DockManager.sip
++++ b/sip/DockManager.sip
+@@ -170,6 +170,8 @@ public:
+ 		HideSingleCentralWidgetTitleBar,
+         FocusHighlighting,
+         EqualSplitOnInsertion,
++        FloatingContainerForceNativeTitleBar,
++        FloatingContainerForceQWidgetTitleBar,
+         DefaultDockAreaButtons,
+ 		DefaultBaseConfig,
+         DefaultOpaqueConfig,
+@@ -206,6 +208,8 @@ public:
+ 	QStringList perspectiveNames() const;
+ 	void savePerspectives(QSettings& Settings) const;
+ 	void loadPerspectives(QSettings& Settings);
++    CDockWidget* centralWidget() const;
++    CDockAreaWidget* setCentralWidget(CDockWidget* widget /Transfer/);
+ 	QAction* addToggleViewActionToMenu(QAction* ToggleViewAction /Transfer/,
+ 		const QString& Group = QString(), const QIcon& GroupIcon = QIcon());
+ 	QMenu* viewMenu() const;
+diff --git a/sip/DockSplitter.sip b/sip/DockSplitter.sip
+index d6a5f31..2b567e2 100644
+--- a/sip/DockSplitter.sip
++++ b/sip/DockSplitter.sip
+@@ -18,6 +18,7 @@ public:
+ 	bool hasVisibleContent() const;
+ 	QWidget* firstWidget() const;
+ 	QWidget* lastWidget() const;
++    bool isResizingWithContainer() const;
+ 
+ };
+ 
+diff --git a/sip/DockWidget.sip b/sip/DockWidget.sip
+index c61853b..5a8a097 100644
+--- a/sip/DockWidget.sip
++++ b/sip/DockWidget.sip
+@@ -84,6 +84,7 @@ public:
+ 	QAction* toggleViewAction() const;
+ 	void setToggleViewActionMode(ads::CDockWidget::eToggleViewActionMode Mode);
+ 	void setMinimumSizeHintMode(ads::CDockWidget::eMinimumSizeHintMode Mode);
++    bool isCentralWidget() const;
+ 	void setIcon(const QIcon& Icon);
+ 	QIcon icon() const;
+ 	QToolBar* toolBar() const;
+diff --git a/sip/FloatingDockContainer.sip b/sip/FloatingDockContainer.sip
+index 4e80db5..0a6d51f 100644
+--- a/sip/FloatingDockContainer.sip
++++ b/sip/FloatingDockContainer.sip
+@@ -52,11 +52,20 @@ protected:
+ 
+ protected:
+ 	virtual void changeEvent(QEvent *event);
+-	virtual void moveEvent(QMoveEvent *event);
+-	virtual bool event(QEvent *e);
+ 	virtual void closeEvent(QCloseEvent *event);
+ 	virtual void hideEvent(QHideEvent *event);
+ 	virtual void showEvent(QShowEvent *event);
++    
++    %If (WS_MACX)
++    virtual bool event(QEvent *e);
++	virtual void moveEvent(QMoveEvent *event);
++    %End
++    
++    %If (WS_X11)
++    virtual void moveEvent(QMoveEvent *event);
++	virtual void resizeEvent(QResizeEvent *event);
++    %End
++    
+ 	%If (WS_WIN)
+ 	virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result);
+ 	%End
+@@ -72,6 +81,15 @@ public:
+     bool hasTopLevelDockWidget() const;
+     ads::CDockWidget* topLevelDockWidget() const;
+     QList<ads::CDockWidget*> dockWidgets() const;
++    
++    %If (WS_X11)
++    void onMaximizeRequest();
++	void showNormal(bool fixGeometry);
++	void showMaximized();
++	bool isMaximized() const;
++	void show();
++	bool hasNativeTitleBar();
++    %End
+ };
+ 
+ };
+diff --git a/sip/linux/FloatingWidgetTitleBar.sip b/sip/linux/FloatingWidgetTitleBar.sip
+index fe37bd3..44a2d38 100644
+--- a/sip/linux/FloatingWidgetTitleBar.sip
++++ b/sip/linux/FloatingWidgetTitleBar.sip
+@@ -15,15 +15,24 @@ protected:
+ 	virtual void mousePressEvent(QMouseEvent *ev);
+ 	virtual void mouseReleaseEvent(QMouseEvent *ev);
+ 	virtual void mouseMoveEvent(QMouseEvent *ev);
++    virtual void mouseDoubleClickEvent(QMouseEvent *event);
++    
++    void setMaximizeIcon(const QIcon& Icon);
++    QIcon maximizeIcon() const;
++    void setNormalIcon(const QIcon& Icon);
++    QIcon normalIcon() const;
+ 
+ public:
+ 	explicit CFloatingWidgetTitleBar(CFloatingDockContainer *parent /TransferThis/ = 0);
+ 	virtual ~CFloatingWidgetTitleBar();
+ 	void enableCloseButton(bool Enable);
+ 	void setTitle(const QString &Text);
++    void updateStyle();
++    void setMaximizedIcon(bool maximized);
+ 
+ signals:
+ 	void closeRequested();
++    void maximizeRequested();
+ };
+ 
+ };

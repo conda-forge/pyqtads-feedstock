@@ -10,6 +10,7 @@ source:
   sha256: 00bec7cbc4e4d917069c0d26ffa20af2cf65a746d9c5e2e5dac935463afbe732
   patches:
     - 0001-setup.patch
+    - 0002-3.6.0.patch
 
 build:
   number: 0

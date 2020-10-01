@@ -1,0 +1,32 @@
+diff --git a/sip/DockFocusController.sip b/sip/DockFocusController.sip
+index 7d8edfd..1f45699 100644
+--- a/sip/DockFocusController.sip
++++ b/sip/DockFocusController.sip
+@@ -20,6 +20,7 @@ public:
+ 
+ 	void notifyWidgetOrAreaRelocation(QWidget* RelocatedWidget);
+ 	void notifyFloatingWidgetDrop(ads::CFloatingDockContainer* FloatingWidget);
++    ads::CDockWidget* focusedDockWidget() const;
+ 
+ public slots:
+ 	void setDockWidgetFocused(ads::CDockWidget* focusedNow);
+diff --git a/sip/DockManager.sip b/sip/DockManager.sip
+index 0f35a5c..b76ee25 100644
+--- a/sip/DockManager.sip
++++ b/sip/DockManager.sip
+@@ -135,6 +135,7 @@ protected:
+ 	ads::CDockOverlay* dockAreaOverlay() const;
+     void notifyWidgetOrAreaRelocation(QWidget* RelocatedWidget);
+     void notifyFloatingWidgetDrop(ads::CFloatingDockContainer* FloatingWidget);
++    ads::CDockWidget* focusedDockWidget() const;
+ 
+     virtual void showEvent(QShowEvent *event);
+ 
+@@ -230,6 +231,7 @@ signals:
+     void perspectiveOpened(const QString& PerspectiveName);
+ 	void floatingWidgetCreated(ads::CFloatingDockContainer*);
+     void dockAreaCreated(ads::CDockAreaWidget*);
++    void dockWidgetAdded(ads::CDockWidget* DockWidget);
+     void dockWidgetAboutToBeRemoved(ads::CDockWidget*);
+     void dockWidgetRemoved(ads::CDockWidget*);
+     void focusedDockWidgetChanged(ads::CDockWidget*, ads::CDockWidget*);

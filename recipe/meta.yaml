@@ -13,7 +13,7 @@ source:
     - 0002-3.6.2.patch
 
 build:
-  number: 0
+  number: 1
   script: {{ PYTHON }} -m pip install . -vv
   skip: true  # [py2k]
 

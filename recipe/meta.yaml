@@ -1,5 +1,5 @@
 {% set name = "pyqtads" %}
-{% set version = "3.7.0" %}
+{% set version = "3.7.1" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/{{ version }}.tar.gz
-  sha256: 9d180a54f9a5af47f6aa8a27fc60b55fa470a13c85ccef26f41e4f90993c3716
+  sha256: 50d6806e6daf6628109cba77d8a22b762494e3bcda303588db1809ae5c5d3653
   patches:
     - 0001-setup.patch
     - 0002-3.7.0.patch

@@ -42,7 +42,7 @@ index ead6b0e..7bbce94 100644
 +            return 0;
 +        }
 +            
-+        if (PyType_IsSubtype((PyTypeObject *)type, Py_TYPE(ParentImpl)))
++        if (PyObject_IsInstance(ParentImpl, type))
 +            return ParentImpl;
 +        
 +        Py_DECREF(ParentImpl);

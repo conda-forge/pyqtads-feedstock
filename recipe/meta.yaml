@@ -7,10 +7,9 @@ package:
 
 source:
   url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/{{ version }}.tar.gz
-  sha256: 096ebfda07aeabf1f6009f0d9a9b6a2e572e5f370d1ef1715340d5ccdba23e2e
+  sha256: e56811228fb4d5f5703c31cd83cb39ab2d5a849f581719d383db72f9322ec7f2
   patches:
     - 0001-setup.patch
-    - 0002-3.7.2.patch
 
 build:
   number: 0

@@ -7,7 +7,7 @@ index 1986df7..98b4063 100644
              elif sys.platform == 'linux':
                  extension.extra_compile_args += ['-std=c++11']
 +                for path in glob.glob(os.path.join(self.qt_include_dir, 'QtGui', '**', 'QtGui', 'qpa'), recursive=True):
-+                    extension.include_dirs.append(path)
++                    extension.include_dirs.append(os.path.dirname(path))
  
          return super().swig_sources(sources, extension)
  

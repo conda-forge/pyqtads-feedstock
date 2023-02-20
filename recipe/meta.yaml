@@ -32,6 +32,7 @@ requirements:
     - pip
     - pyqt
     - qt-main
+    - pyqt-builder
     - setuptools
     - xorg-libxfixes  # [linux]
   run:

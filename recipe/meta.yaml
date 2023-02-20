@@ -30,15 +30,14 @@ requirements:
   host:
     - python
     - pip
-    - pyqt 5.12.*
-    - qt 5.12.*
+    - pyqt
+    - qt-main
     - setuptools
     - xorg-libxfixes  # [linux]
   run:
     - python
-    - pyqt 5.12.*
+    - pyqt
     - pywin32   # [win]
-    - qt 5.12.*
 
 test:
   imports:

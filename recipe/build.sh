@@ -5,7 +5,6 @@ EXTRA_FLAGS=""
 
 $SIP_COMMAND \
 --verbose \
---confirm-license \
 --no-make \
 $EXTRA_FLAGS
 

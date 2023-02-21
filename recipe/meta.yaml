@@ -9,8 +9,8 @@ source:
   url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/{{ version }}.tar.gz
   sha256: c65357f630dc22b645b5dfa2684fb2748a347235267e952dc30986da9bf88f50
   patches:
-    - 0001-setup.patch
-    - 0002-3.8.2.patch
+    - 0001-version.patch
+    - 0002-DockManager.patch
 
 build:
   number: 0
@@ -24,22 +24,22 @@ requirements:
     - make                           # [unix]
     - {{ cdt('mesa-libgl-devel') }}  # [linux]
     - {{ cdt('mesa-dri-drivers') }}  # [linux]
-    - {{ cdt('libselinux') }}  # [linux]
-    - {{ cdt('libxdamage') }}  # [linux]
-    - {{ cdt('libxxf86vm') }}  # [linux]
-    - {{ cdt('libxext') }}     # [linux]
+    - {{ cdt('libselinux') }}        # [linux]
+    - {{ cdt('libxdamage') }}        # [linux]
+    - {{ cdt('libxxf86vm') }}        # [linux]
+    - {{ cdt('libxext') }}           # [linux]
+    - jom                            # [win]
   host:
     - python
     - pip
     - pyqt
     - qt-main
     - pyqt-builder
-    - setuptools
-    - xorg-libxfixes  # [linux]
+    - xorg-libxfixes                 # [linux]
   run:
     - python
     - pyqt
-    - pywin32   # [win]
+    - pywin32                        # [win]
 
 test:
   imports:

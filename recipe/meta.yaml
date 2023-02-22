@@ -20,6 +20,7 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - pyqt-builder
     - make                           # [unix]
     - {{ cdt('mesa-libgl-devel') }}  # [linux]
     - {{ cdt('mesa-dri-drivers') }}  # [linux]
@@ -30,10 +31,8 @@ requirements:
     - jom                            # [win]
   host:
     - python
-    - pip
     - pyqt
     - qt-main
-    - pyqt-builder
     - xorg-libxfixes                 # [linux]
   run:
     - python

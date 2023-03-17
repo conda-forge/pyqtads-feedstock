@@ -11,6 +11,9 @@ source:
   patches:
     - 0001-version.patch
     - 0002-DockManager.patch
+    - 0003-project.patch
+    - 0004-DockContainerWidget.patch
+    - 0005-pyproject.patch
 
 build:
   number: 0
@@ -20,7 +23,6 @@ requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - pyqt-builder
     - make                           # [unix]
     - {{ cdt('mesa-libgl-devel') }}  # [linux]
     - {{ cdt('mesa-dri-drivers') }}  # [linux]
@@ -30,8 +32,10 @@ requirements:
     - {{ cdt('libxext') }}           # [linux]
     - jom                            # [win]
   host:
+    - pyqt-builder
     - python
     - pyqt
+    - sip
     - qt-main
     - xorg-libxfixes                 # [linux]
   run:

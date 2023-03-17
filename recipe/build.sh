@@ -6,6 +6,7 @@ EXTRA_FLAGS=""
 $SIP_COMMAND \
 --verbose \
 --no-make \
+--ads-libdir=$PREFIX\lib
 $EXTRA_FLAGS
 
 pushd build

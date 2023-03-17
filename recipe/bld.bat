@@ -3,7 +3,8 @@ set PATH=%LIBRARY_INC%;%PATH%
 
 call sip-build ^
     --verbose ^
-    --no-make
+    --no-make ^
+    --ads-libdir=%LIBRARY_LIB%
 if %ERRORLEVEL% neq 0 exit 1
 
 pushd build

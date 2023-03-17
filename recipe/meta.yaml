@@ -32,6 +32,7 @@ requirements:
     - jom                            # [win]
   host:
     - pyqt-builder
+    - setuptools
     - python
     - pyqt
     - sip

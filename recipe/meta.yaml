@@ -9,11 +9,10 @@ source:
   url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/{{ version }}.tar.gz
   sha256: c65357f630dc22b645b5dfa2684fb2748a347235267e952dc30986da9bf88f50
   patches:
-    - 0001-version.patch
+    - 0001-pyproject.patch
     - 0002-DockManager.patch
     - 0003-project.patch
     - 0004-DockContainerWidget.patch
-    - 0005-pyproject.patch
 
 build:
   number: 0
@@ -36,6 +35,7 @@ requirements:
     - python
     - pyqt
     - sip
+    - qt5-advanced-docking-system
     - qt-main
     - xorg-libxfixes                 # [linux]
   run:

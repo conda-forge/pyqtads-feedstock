@@ -3,6 +3,17 @@ set -exou
 SIP_COMMAND="sip-build"
 EXTRA_FLAGS=""
 
+if [[ $(uname) == "Linux" ]]; then
+    ln -s ${GXX} g++ || true
+    ln -s ${GCC} gcc || true
+
+    export LD=${GXX}
+    export CC=${GCC}
+    export CXX=${GXX}
+
+    chmod +x g++ gcc
+fi
+
 $SIP_COMMAND \
 --verbose \
 --no-make \

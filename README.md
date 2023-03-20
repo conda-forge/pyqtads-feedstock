@@ -1,11 +1,11 @@
-About pyqtads
-=============
+About pyqtads-feedstock
+=======================
+
+Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/pyqtads-feedstock/blob/main/LICENSE.txt)
 
 Home: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System
 
 Package license: LGPLv2+
-
-Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/pyqtads-feedstock/blob/main/LICENSE.txt)
 
 Summary: Advanced Docking System for Qt
 

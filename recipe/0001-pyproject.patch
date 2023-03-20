@@ -1,0 +1,51 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index 825aa90..864556c 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -6,7 +6,7 @@ build-backend = "sipbuild.api"
+ # Specify the PEP 566 metadata for the project.
+ [tool.sip.metadata]
+ name = "PyQtAds"
+-version = "3.8.2"
++version = "4.0.1"
+ summary = "Python bindings for Qt Advanced Docking System"
+ home-page = "https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/"
+ license = "LGPL v2.1"
+@@ -23,6 +23,9 @@ sip-file = "ads.sip"
+ include-dirs = ["src"]
+-qmake-QT = ["widgets"]
++qmake-QT = ["widgets", "gui-private; platform_system == 'Linux'"]
+ headers = [
++    "src/AutoHideDockContainer.h",
++	"src/AutoHideSideBar.h",
++	"src/AutoHideTab.h",
+ 	"src/DockAreaTabBar.h",
+ 	"src/DockAreaTitleBar.h",
+ 	"src/DockAreaTitleBar_p.h",
+@@ -40,10 +43,15 @@ headers = [
+ 	"src/FloatingDockContainer.h",
+ 	"src/FloatingDragPreview.h",
+ 	"src/IconProvider.h",
++	"src/PushButton.h",
++	"src/ResizeHandle.h",
+ 	"src/ads_globals.h",
+-	# "src/linux/FloatingWidgetTitleBar.h",
++	"src/linux/FloatingWidgetTitleBar.h; platform_system == 'Linux'",
+ ]
+ sources = [
++    "src/AutoHideDockContainer.cpp",
++	"src/AutoHideSideBar.cpp",
++	"src/AutoHideTab.cpp",
+ 	"src/DockAreaTabBar.cpp",
+ 	"src/DockAreaTitleBar.cpp",
+ 	"src/DockAreaWidget.cpp",
+@@ -60,6 +68,8 @@ sources = [
+ 	"src/FloatingDockContainer.cpp",
+ 	"src/FloatingDragPreview.cpp",
+ 	"src/IconProvider.cpp",
++	"src/PushButton.cpp",
++	"src/ResizeHandle.cpp",
+ 	"src/ads_globals.cpp",
+-	# "src/linux/FloatingWidgetTitleBar.cpp",
++	"src/linux/FloatingWidgetTitleBar.cpp; platform_system == 'Linux'",
+ ]

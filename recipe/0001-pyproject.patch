@@ -29,7 +29,7 @@ index 825aa90..864556c 100644
 +	"src/ResizeHandle.h",
  	"src/ads_globals.h",
 -	# "src/linux/FloatingWidgetTitleBar.h",
-+	"src/linux/FloatingWidgetTitleBar.h",
++	"src/linux/FloatingWidgetTitleBar.h; platform_system == 'Linux'",
  ]
  sources = [
 +    "src/AutoHideDockContainer.cpp",
@@ -46,5 +46,5 @@ index 825aa90..864556c 100644
 +	"src/ResizeHandle.cpp",
  	"src/ads_globals.cpp",
 -	# "src/linux/FloatingWidgetTitleBar.cpp",
-+	"src/linux/FloatingWidgetTitleBar.cpp",
++	"src/linux/FloatingWidgetTitleBar.cpp; platform_system == 'Linux'",
  ]

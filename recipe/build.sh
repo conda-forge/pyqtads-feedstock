@@ -12,6 +12,7 @@ if [[ $(uname) == "Linux" ]]; then
     export CXX=${GXX}
 
     chmod +x g++ gcc
+    export PATH=${PWD}:${PATH}
 fi
 
 $SIP_COMMAND \

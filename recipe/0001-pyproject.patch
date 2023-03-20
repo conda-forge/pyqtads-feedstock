@@ -13,7 +13,8 @@ index 825aa90..864556c 100644
  license = "LGPL v2.1"
 @@ -23,6 +23,9 @@ sip-file = "ads.sip"
  include-dirs = ["src"]
- qmake-QT = ["widgets"]
+-qmake-QT = ["widgets"]
++qmake-QT = ["widgets", "gui-private; platform_system == 'Linux'"]
  headers = [
 +    "src/AutoHideDockContainer.h",
 +	"src/AutoHideSideBar.h",

@@ -8,7 +8,7 @@ index a8233cd..9c79d24 100644
  
  from pyqtbuild import PyQtBindings, PyQtProject
  from sipbuild import Option
-@@ -17,11 +18,39 @@ class ads(PyQtBindings):
+@@ -17,11 +18,36 @@ class ads(PyQtBindings):
  
  		super().__init__(project, 'ads')
  
@@ -34,9 +34,6 @@ index a8233cd..9c79d24 100644
  		resource_file = os.path.join(self.project.root_dir,'src','ads.qrc')
  		print("Adding resource file to qmake project: ", resource_file)
  		self.builder_settings.append('RESOURCES += '+resource_file)
-+
-+		if sys.platform == "linux":
-+			self.builder_settings.append('QT += gui-private')
  		
 +		if self.ads_lib is not None:
 +			self.libraries.append(self.ads_lib)

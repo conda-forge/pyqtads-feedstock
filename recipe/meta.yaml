@@ -42,7 +42,6 @@ requirements:
   run:
     - python
     - pyqt
-    - pywin32                        # [win]
 
 test:
   imports:

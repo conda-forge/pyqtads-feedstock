@@ -5,7 +5,7 @@ Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/pyqtads-feedsto
 
 Home: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System
 
-Package license: LGPLv2+
+Package license: LGPL-2.0-or-later
 
 Summary: Advanced Docking System for Qt
 

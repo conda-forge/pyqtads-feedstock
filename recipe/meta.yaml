@@ -1,5 +1,5 @@
 {% set name = "pyqtads" %}
-{% set version = "4.0.2" %}
+{% set version = "4.0.3" %}
 
 package:
   name: {{ name|lower }}
@@ -7,12 +7,9 @@ package:
 
 source:
   url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/{{ version }}.tar.gz
-  sha256: b5bf5ebcb77c09ddf92e1e71f78b6598c1fc9311e2cca2dfed3a32ce45f2950d
+  sha256: c094590391d85cc91f688c9d8762767cb73eba1129d8ed9245d09bb632369e33
   patches:
-    - 0001-pyproject.patch
-    - 0002-DockManager.patch
-    - 0003-project.patch
-    - 0004-DockContainerWidget.patch
+    - 0001-pyproject.patch  # [linux]
 
 build:
   number: 0

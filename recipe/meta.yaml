@@ -12,7 +12,7 @@ source:
     - 0001-4.1.0.patch
 
 build:
-  number: 0
+  number: 1
   skip: true  # [py2k]
 
 requirements:

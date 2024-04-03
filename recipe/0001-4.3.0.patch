@@ -1,0 +1,212 @@
+diff --git a/sip/DockAreaTitleBar.sip b/sip/DockAreaTitleBar.sip
+index 70e3d90..06c7b19 100644
+--- a/sip/DockAreaTitleBar.sip
++++ b/sip/DockAreaTitleBar.sip
+@@ -12,10 +12,14 @@ class CTitleBarButton : QToolButton
+     %End
+     
+ public:
+-	CTitleBarButton(bool visible = true, QWidget* parent /TransferThis/ = Q_NULLPTR );
++	CTitleBarButton(bool ShowInTitleBar, bool HideWhenDisabled, TitleBarButton ButtonId,
++		QWidget* /TransferThis/ = Q_NULLPTR );
+ 	virtual void setVisible(bool);
+ 	void setShowInTitleBar(bool);
+ 
++    TitleBarButton buttonId() const;
++	ads::CDockAreaTitleBar* titleBar() const;
++    bool isInAutoHideArea() const;
+ 
+ protected:
+ 	bool event(QEvent *ev);
+@@ -44,13 +48,15 @@ public:
+ 	ads::CDockAreaTabBar* tabBar() const;
+ 	ads::CTitleBarButton* button(ads::TitleBarButton which) const;
+     ads::CElidingLabel* autoHideTitleLabel() const;
++    ads::CDockAreaWidget* dockAreaWidget() const;
+  	void updateDockWidgetActionsButtons();
+ 	virtual void setVisible(bool Visible);
+ 	void insertWidget(int index, QWidget *widget /Transfer/ );
+ 	int indexOf(QWidget *widget) const;
+     QString titleBarButtonToolTip(ads::TitleBarButton Button) const;
+     void setAreaFloating();
+-    
++    void showAutoHideControls(bool Show);
++    bool isAutoHide() const;
+ 
+ signals:
+ 	void tabBarClicked(int index);
+diff --git a/sip/DockAreaWidget.sip b/sip/DockAreaWidget.sip
+index 5274821..6e091f6 100644
+--- a/sip/DockAreaWidget.sip
++++ b/sip/DockAreaWidget.sip
+@@ -41,6 +41,7 @@ public:
+ 	ads::CDockManager* dockManager() const;
+ 	ads::CDockContainerWidget* dockContainer() const;
+     ads::CAutoHideDockContainer* autoHideDockContainer() const;
++    ads::CDockSplitter* parentSplitter() const;
+     bool isAutoHide() const;
+     void setAutoHideDockContainer(CAutoHideDockContainer*);
+ 	virtual QSize minimumSizeHint() const;
+diff --git a/sip/DockContainerWidget.sip b/sip/DockContainerWidget.sip
+index 9159452..1b1b048 100644
+--- a/sip/DockContainerWidget.sip
++++ b/sip/DockContainerWidget.sip
+@@ -20,13 +20,14 @@ class CDockContainerWidget : QFrame
+ 
+ protected:
+ 	virtual bool event(QEvent *e);
+-	QSplitter* rootSplitter() const;
++	ads::CDockSplitter* rootSplitter() const;
+     ads::CAutoHideDockContainer* createAndSetupAutoHideContainer(ads::SideBarLocation area, ads::CDockWidget* DockWidget /Transfer/, int TabIndex = -1);
+ 	void createRootSplitter();
+ 	void dropFloatingWidget(ads::CFloatingDockContainer* FloatingWidget, const QPoint& TargetPos);
+     void dropWidget(QWidget* Widget, DockWidgetArea DropArea, CDockAreaWidget* TargetAreaWidget, int TabIndex = -1);
+ 	void addDockArea(ads::CDockAreaWidget* DockAreaWidget /Transfer/, ads::DockWidgetArea area = ads::CenterDockWidgetArea);
+ 	void removeDockArea(ads::CDockAreaWidget* area /TransferBack/);
++    QList<QPointer<ads::CDockAreaWidget>> removeAllDockAreas();
+ 	void saveState(QXmlStreamWriter& Stream) const;
+ 	bool restoreState(CDockingStateReader& Stream, bool Testing);
+ 	ads::CDockAreaWidget* lastAddedDockAreaWidget(ads::DockWidgetArea area) const;
+diff --git a/sip/DockManager.sip b/sip/DockManager.sip
+index b7faf9c..8ece9c6 100644
+--- a/sip/DockManager.sip
++++ b/sip/DockManager.sip
+@@ -172,6 +172,8 @@ public:
+         FloatingContainerForceNativeTitleBar,
+         FloatingContainerForceQWidgetTitleBar,
+         MiddleMouseButtonClosesTab,
++        DisableTabTextEliding,
++        ShowTabTextOnlyForActiveTab,
+         DefaultDockAreaButtons,
+ 		DefaultBaseConfig,
+         DefaultOpaqueConfig,
+@@ -188,6 +190,8 @@ public:
+ 		AutoHideSideBarsIconOnly,
+ 		AutoHideShowOnMouseOver,
+         AutoHideCloseButtonCollapsesDock,
++        AutoHideHasCloseButton,
++        AutoHideHasMinimizeButton,
+ 		DefaultAutoHideConfig,
+ 	};
+     typedef QFlags<ads::CDockManager::eAutoHideFlag> AutoHideFlags;
+@@ -245,6 +249,12 @@ public:
+     void setSplitterSizes(ads::CDockAreaWidget *ContainedArea, const QList<int>& sizes);
+     static void setFloatingContainersTitle(const QString& Title);
+ 	static QString floatingContainersTitle();
++    void setDockWidgetToolBarStyle(Qt::ToolButtonStyle Style, ads::CDockWidget::eState State);
++    Qt::ToolButtonStyle dockWidgetToolBarStyle(ads::CDockWidget::eState State) const;
++    void setDockWidgetToolBarIconSize(const QSize& IconSize, ads::CDockWidget::eState State);
++    QSize dockWidgetToolBarIconSize(ads::CDockWidget::eState State) const;
++    ads::CDockWidget::DockWidgetFeatures globallyLockedDockWidgetFeatures() const;
++    void lockDockWidgetFeaturesGlobally(ads::CDockWidget::DockWidgetFeatures Features = ads::CDockWidget::GloballyLockableFeatures);
+ 
+ public slots:
+     void endLeavingMinimizedState();
+diff --git a/sip/DockWidget.sip b/sip/DockWidget.sip
+index 5fac34c..c196561 100644
+--- a/sip/DockWidget.sip
++++ b/sip/DockWidget.sip
+@@ -39,6 +39,7 @@ public:
+         DefaultDockWidgetFeatures,
+         AllDockWidgetFeatures,
+         DockWidgetAlwaysCloseAndDelete,
++        GloballyLockableFeatures,
+ 		NoDockWidgetFeatures
+ 	};
+     typedef QFlags<ads::CDockWidget::DockWidgetFeature> DockWidgetFeatures;
+@@ -49,6 +50,12 @@ public:
+ 		StateDocked,
+ 		StateFloating
+ 	};
++    
++    enum eToolBarStyleSource
++    {
++    	ToolBarStyleFromDockManager,
++    	ToolBarStyleFromDockWidget
++    };
+ 
+ 	enum eInsertMode
+ 	{
+@@ -72,7 +79,7 @@ public:
+ 	};
+ 
+ 
+-	CDockWidget(const QString &title, QWidget* parent /TransferThis/ = 0);
++	CDockWidget(const QString &title, QWidget* parent /TransferThis/ = Q_NULLPTR);
+ 	virtual ~CDockWidget();
+ 	virtual QSize minimumSizeHint() const;
+ 	void setWidget(QWidget* widget /Transfer/, ads::CDockWidget::eInsertMode InsertMode = AutoScrollArea);
+@@ -82,6 +89,7 @@ public:
+ 	void setFeatures(ads::CDockWidget::DockWidgetFeatures features);
+ 	void setFeature(ads::CDockWidget::DockWidgetFeature flag, bool on);
+ 	ads::CDockWidget::DockWidgetFeatures features() const;
++    void notifyFeaturesChanged();
+ 	ads::CDockManager* dockManager() const;
+ 	ads::CDockContainerWidget* dockContainer() const;
+     ads::CFloatingDockContainer* floatingDockContainer() const;
+@@ -95,6 +103,7 @@ public:
+ 	bool isInFloatingContainer() const;
+ 	bool isClosed() const;
+ 	QAction* toggleViewAction() const;
++    void setToggleViewAction(QAction* action);
+ 	void setToggleViewActionMode(ads::CDockWidget::eToggleViewActionMode Mode);
+ 	void setMinimumSizeHintMode(ads::CDockWidget::eMinimumSizeHintMode Mode);
+     ads::CDockWidget::eMinimumSizeHintMode minimumSizeHintMode() const;
+@@ -104,6 +113,8 @@ public:
+ 	QToolBar* toolBar() const;
+ 	QToolBar* createDefaultToolBar();
+ 	void setToolBar(QToolBar* ToolBar /Transfer/ );
++    void setToolBarStyleSource(ads::CDockWidget::eToolBarStyleSource Source);
++    ads::CDockWidget::eToolBarStyleSource toolBarStyleSource() const;
+ 	void setToolBarStyle(Qt::ToolButtonStyle Style, ads::CDockWidget::eState State);
+ 	Qt::ToolButtonStyle toolBarStyle(ads::CDockWidget::eState State) const;
+ 	void setToolBarIconSize(const QSize& IconSize, ads::CDockWidget::eState State);
+diff --git a/sip/ElidingLabel.sip b/sip/ElidingLabel.sip
+index 7cd47b1..1f6ff69 100644
+--- a/sip/ElidingLabel.sip
++++ b/sip/ElidingLabel.sip
+@@ -17,8 +17,8 @@ protected:
+     virtual void mouseDoubleClickEvent( QMouseEvent *ev );
+     
+ public:
+-	CElidingLabel(QWidget* parent /TransferThis/ = 0, Qt::WindowFlags f = 0);
+-	CElidingLabel(const QString& text, QWidget* parent /TransferThis/ = 0, Qt::WindowFlags f = 0);
++	CElidingLabel(QWidget* parent /TransferThis/ = void notifyFeaturesChanged();, Qt::WindowFlags f = Qt::WindowFlags ());
++	CElidingLabel(const QString& text, QWidget* parent /TransferThis/ = void notifyFeaturesChanged();, Qt::WindowFlags f = Qt::WindowFlags ());
+ 	virtual ~CElidingLabel();
+ 	Qt::TextElideMode elideMode() const;
+ 	void setElideMode(Qt::TextElideMode mode);
+diff --git a/sip/FloatingDockContainer.sip b/sip/FloatingDockContainer.sip
+index b36f4ce..a35ea89 100644
+--- a/sip/FloatingDockContainer.sip
++++ b/sip/FloatingDockContainer.sip
+@@ -27,6 +27,7 @@ public:
+ 
+ 	virtual void moveFloating() = 0;
+ 	virtual void finishDragging() = 0;
++    void deleteContent();
+ 	virtual ~IFloatingWidget();
+ };
+ 
+@@ -82,6 +83,7 @@ public:
+     bool hasTopLevelDockWidget() const;
+     ads::CDockWidget* topLevelDockWidget() const;
+     QList<ads::CDockWidget*> dockWidgets() const;
++    void finishDropOperation();
+     
+     %If (WS_X11)
+     void onMaximizeRequest();
+diff --git a/sip/ads_globals.sip b/sip/ads_globals.sip
+index bbe6491..719b930 100644
+--- a/sip/ads_globals.sip
++++ b/sip/ads_globals.sip
+@@ -73,7 +73,8 @@ namespace ads
+         TitleBarButtonTabsMenu,
+         TitleBarButtonUndock,
+         TitleBarButtonClose,
+-        TitleBarButtonAutoHide
++        TitleBarButtonAutoHide,
++        TitleBarButtonMinimize
+     };
+ 
+     enum eDragState

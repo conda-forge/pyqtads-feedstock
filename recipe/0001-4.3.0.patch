@@ -63,7 +63,7 @@ index 9159452..019d695 100644
      void dropWidget(QWidget* Widget, DockWidgetArea DropArea, CDockAreaWidget* TargetAreaWidget, int TabIndex = -1);
  	void addDockArea(ads::CDockAreaWidget* DockAreaWidget /Transfer/, ads::DockWidgetArea area = ads::CenterDockWidgetArea);
  	void removeDockArea(ads::CDockAreaWidget* area /TransferBack/);
-+    QList<ads::CDockAreaWidget*> removeAllDockAreas();
++    /*QList<ads::CDockAreaWidget*> removeAllDockAreas();*/
  	void saveState(QXmlStreamWriter& Stream) const;
  	bool restoreState(CDockingStateReader& Stream, bool Testing);
  	ads::CDockAreaWidget* lastAddedDockAreaWidget(ads::DockWidgetArea area) const;

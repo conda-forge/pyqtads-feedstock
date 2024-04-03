@@ -48,7 +48,7 @@ index 5274821..6e091f6 100644
      void setAutoHideDockContainer(CAutoHideDockContainer*);
  	virtual QSize minimumSizeHint() const;
 diff --git a/sip/DockContainerWidget.sip b/sip/DockContainerWidget.sip
-index 9159452..1b1b048 100644
+index 9159452..019d695 100644
 --- a/sip/DockContainerWidget.sip
 +++ b/sip/DockContainerWidget.sip
 @@ -20,13 +20,14 @@ class CDockContainerWidget : QFrame
@@ -162,7 +162,7 @@ index 5fac34c..c196561 100644
  	Qt::ToolButtonStyle toolBarStyle(ads::CDockWidget::eState State) const;
  	void setToolBarIconSize(const QSize& IconSize, ads::CDockWidget::eState State);
 diff --git a/sip/ElidingLabel.sip b/sip/ElidingLabel.sip
-index 7cd47b1..1f6ff69 100644
+index 7cd47b1..57fef9c 100644
 --- a/sip/ElidingLabel.sip
 +++ b/sip/ElidingLabel.sip
 @@ -17,8 +17,8 @@ protected:
@@ -177,17 +177,17 @@ index 7cd47b1..1f6ff69 100644
  	Qt::TextElideMode elideMode() const;
  	void setElideMode(Qt::TextElideMode mode);
 diff --git a/sip/FloatingDockContainer.sip b/sip/FloatingDockContainer.sip
-index b36f4ce..a35ea89 100644
+index b36f4ce..79ed06e 100644
 --- a/sip/FloatingDockContainer.sip
 +++ b/sip/FloatingDockContainer.sip
-@@ -27,6 +27,7 @@ public:
- 
- 	virtual void moveFloating() = 0;
- 	virtual void finishDragging() = 0;
+@@ -44,6 +44,7 @@ protected:
+     void startDragging(const QPoint& DragStartMousePos, const QSize& Size,
+         QWidget* MouseEventHandler);
+ 	virtual void finishDragging();
 +    void deleteContent();
- 	virtual ~IFloatingWidget();
- };
- 
+ 	void initFloatingGeometry(const QPoint& DragStartMousePos, const QSize& Size);
+ 	void moveFloating();
+ 	bool restoreState(ads::CDockingStateReader& Stream, bool Testing);
 @@ -82,6 +83,7 @@ public:
      bool hasTopLevelDockWidget() const;
      ads::CDockWidget* topLevelDockWidget() const;

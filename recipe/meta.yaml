@@ -1,5 +1,5 @@
 {% set name = "pyqtads" %}
-{% set version = "4.3.0" %}
+{% set version = "4.3.1" %}
 
 package:
   name: {{ name|lower }}
@@ -7,9 +7,7 @@ package:
 
 source:
   url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/{{ version }}.tar.gz
-  sha256: 75d16c91a2417648555d5a061b2d9033e67e378783548230b89ea3140b8efc53
-  patches:
-    - 0001-4.3.0.patch
+  sha256: d7c244d9accaa78766e90124c0ce6054327b78625dae8ba2cfe22fc29dfba37d
 
 build:
   number: 0
@@ -18,6 +16,7 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
+    - {{ stdlib("c") }}
     - {{ compiler('cxx') }}
     - make
     - {{ cdt('mesa-libgl-devel') }}  # [linux]

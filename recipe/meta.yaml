@@ -10,7 +10,7 @@ source:
   sha256: d7c244d9accaa78766e90124c0ce6054327b78625dae8ba2cfe22fc29dfba37d
 
 build:
-  number: 2
+  number: 3
   skip: true  # [py2k]
 
 requirements:
@@ -19,12 +19,6 @@ requirements:
     - {{ stdlib("c") }}
     - {{ compiler('cxx') }}
     - make
-    - {{ cdt('mesa-libgl-devel') }}  # [linux]
-    - {{ cdt('mesa-dri-drivers') }}  # [linux]
-    - {{ cdt('libselinux') }}        # [linux]
-    - {{ cdt('libxdamage') }}        # [linux]
-    - {{ cdt('libxxf86vm') }}        # [linux]
-    - {{ cdt('libxext') }}           # [linux]
     - jom                            # [win]
   host:
     - pyqt-builder
@@ -35,6 +29,7 @@ requirements:
     - qt5-advanced-docking-system
     - qt-main
     - xorg-libxfixes                 # [linux]
+    - libgl-devel                    # [linux]
   run:
     - python
     - pyqt

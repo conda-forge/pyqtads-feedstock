@@ -1,16 +1,16 @@
 {% set name = "pyqtads" %}
-{% set version = "4.3.1" %}
+{% set version = "5.1.1" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/{{ version }}.tar.gz
-  sha256: d7c244d9accaa78766e90124c0ce6054327b78625dae8ba2cfe22fc29dfba37d
+  url: https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/archive/v{{ version }}.tar.gz
+  sha256: 9ce947acbb1984946f9145c976e42e6984f99b98fb414dd7354a290af6d4ff04
 
 build:
-  number: 3
+  number: 0
   skip: true  # [py2k]
 
 requirements:
